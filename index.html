@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+
+
+    <script>
+        let product = {
+            "id": 100,
+            "title": "Cup",
+            "description": "Attractive DesignMetallic materialFour key hooksReliable & DurablePremium Quality",
+            "price": 30,
+            "discountPercentage": 2.92,
+            "rating": 4.92,
+            "stock": 54,
+            "brand": "Golden",
+            "category": "home-decoration",
+            "thumbnail": "https://i.dummyjson.com/data/products/30/thumbnail.jpg",
+            "images": [
+                "https://i.dummyjson.com/data/products/30/1.jpg",
+                "https://i.dummyjson.com/data/products/30/2.jpg",
+                "https://i.dummyjson.com/data/products/30/3.jpg",
+                "https://i.dummyjson.com/data/products/30/thumbnail.jpg"
+            ]
+        }
+
+        // fetch('http://localhost:3000/products', {
+        //     method: "POST",
+        //     body: JSON.stringify(product),
+        //     headers: {
+        //         'Content-Type': 'application/json'
+        //     }
+        // })
+        //     .then((data) => {
+        //         return data.json();
+        //     })
+        //     .then((data) => {
+        //         console.log(data);
+        //     })
+        //     .catch((err) => {
+        //         console.log("ERR : ", err)
+        //     })
+
+
+        fetch('http://localhost:3000/products?id=100', {
+            method: "DELETE",
+        })
+            .then((data) => {
+                return data.json();
+            })
+            .then((data) => {
+                console.log(data);
+            })
+            .catch((err) => {
+                console.log("ERR : ", err)
+            })
+    </script>
+</body>
+
+</html>

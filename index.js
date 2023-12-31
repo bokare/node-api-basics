@@ -9,39 +9,36 @@ const url = require("url");
 
 http
   .createServer((req, res) => {
-    // console.log(req.method);
-
+    
     let parsedUrl = url.parse(req.url, true);
     // console.log(parsedUrl);
-
     // reading the file as string
     let products = fs.readFileSync("./products.json", "utf-8");
 
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Headers", "*");
-    res.setHeader(
-      "Access-Control-Allow-Methods",
-      "GET,PUT,POST,PATCH,DELETE,OPTIONS"
-    );
+    // to handle cors error 
+    res.setHeader("Access-Control-Allow-Origin", "*");    // for get method 
+    res.setHeader("Access-Control-Allow-Headers", "*");   // for put,post , delete method'S HEADER
+    res.setHeader("Access-Control-Allow-Methods","GET,PUT,POST,PATCH,DELETE,OPTIONS");
 
     // handling options preflight request which comes before post,put and delete automically
+    // ***** IMP *****  when we send an PUT, POS , PATCH, DELETE  method, browser internally send first an OPTIONS 
+    //    request to server , after resolving that request an given (which we send ) request will send to server .
+    //    in postman, thunderClient it doesnot happen as theyare testing client . in testing client cors error does not come.
     if (req.method == "OPTIONS") {
-      res.end();
+      console.log(req.method);
+      console.log("OPTION method");
+      res.end();        // req send by browser when PUT,POST,PATCH,DELETE req 
+    }
+
+    if(parsedUrl.pathname == "/" && req.method == "GET"){
+      res.end('<h1>welcome to api</h1>')
     }
     // fetch all the products
-    if (
-      parsedUrl.pathname == "/products" &&
-      req.method == "GET" &&
-      parsedUrl.query.id == undefined
-    ) {
+    else if (parsedUrl.pathname == "/products" && req.method == "GET" && parsedUrl.query.id == undefined ) {
       res.end(products);
     }
     // fetch product based on id
-    else if (
-      parsedUrl.pathname == "/products" &&
-      req.method == "GET" &&
-      parsedUrl.query.id != undefined
-    ) {
+    else if (parsedUrl.pathname == "/products" &&req.method == "GET" && parsedUrl.query.id != undefined) {
       let productArray = JSON.parse(products);
 
       let product = productArray.find((product) => {
@@ -82,8 +79,90 @@ http
         );
       });
     }
+     // endpoint to update a product 
+     else if(req.method=="PUT" && parsedUrl.pathname=="/products")
+     {
+         
+     
+         let product="";
+ 
+         req.on("data",(chunk)=>{
+             product+=chunk;
+         })
+ 
+         req.on("end",()=>{
+ 
+             let productsArray=JSON.parse(products);
+             let productOBJ = JSON.parse(product);
+ 
+             let index = productsArray.findIndex((product)=>{
+                 return product.id==parsedUrl.query.id;
+             })
+ 
+             if(index!==-1)
+             {
+                 productsArray[index]=productOBJ;
+ 
+                 fs.writeFile("./products.json",JSON.stringify(productsArray),(err)=>{
+                     if(err==null)
+                     {
+                         res.end(JSON.stringify({"message":"Product successfully updated"}))
+                     }
+                     else 
+                     {
+                         res.end(JSON.stringify({"message":"Some problem"}))
+                     }
+                 })
+ 
+ 
+             }
+             else 
+             {
+                 res.end(JSON.stringify({"message":"The element with given id is not there"}))
+             }
+ 
+ 
+ 
+         })
+ 
+     }
+ 
+     // end point to delete a product based on id 
+     else if(req.method=="DELETE" && parsedUrl.pathname=="/products")
+     {
+        
+         let productsArray = JSON.parse(products);
+ 
+         let index=productsArray.findIndex((product)=>{
+             return product.id == parsedUrl.query.id;
+         })
+ 
+         if(index!==-1)
+         {
+             productsArray.splice(index,1);
+ 
+             fs.writeFile("./products.json",JSON.stringify(productsArray),(err)=>{
+                 if(err==null)
+                 {
+                     res.end(JSON.stringify({"message":"Product successfully deleted"}))
+                 }
+                 else 
+                 {
+                     res.end(JSON.stringify({"message":"Some problem"}))
+                 }
+             })
+         }
+         else 
+         {
+             res.end(JSON.stringify({"message":"The element with given id is not there"}))
+         }
+     
+ 
+        
+ 
+     }
+     
   })
-  .listen(8000,()=>{
+  .listen(3000, () => {
     console.log("app is listening on port 3000");
-    
   });
