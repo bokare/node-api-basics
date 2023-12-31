@@ -20,6 +20,7 @@ http
     res.setHeader("Access-Control-Allow-Headers", "*");   // for put,post , delete method'S HEADER
     res.setHeader("Access-Control-Allow-Methods","GET,PUT,POST,PATCH,DELETE,OPTIONS");
 
+    // whitelisting of requst on server side 
     // handling options preflight request which comes before post,put and delete automically
     // ***** IMP *****  when we send an PUT, POS , PATCH, DELETE  method, browser internally send first an OPTIONS 
     //    request to server , after resolving that request an given (which we send ) request will send to server .
